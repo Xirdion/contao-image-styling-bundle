@@ -21,48 +21,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 #[AsHook('parseTemplate', 'onParseTemplate')]
 class ParseTemplateListener
 {
-    /** @var array<string> */
+    /** @var string[] */
     private static array $css = [];
 
     private ?Request $request;
     private Template $template;
-
-    /** @phpstan-ignore-next-line */
-    private array $templateData;
-
-    /**
-     * Styling for normal images.
-     *
-     * @var string
-     */
-    private string $style = <<<'CSS'
-        .image_container_%s::before {
-            padding-top: %s%%;
-        }
-        .image_container_%s {
-            width: %spx;
-        }
-        CSS;
-
-    /**
-     * Styling of images with multiple sources.
-     *
-     * @var string
-     */
-    private string $mediaStyle = <<<'CSS'
-        @media only screen and %s {
-            .image_container_%s::before {
-                padding-top: %s%%;
-            }
-            .image_container_%s {
-                width: %spx;
-            }
-        }
-        CSS;
+    private string $style;
+    private string $mediaStyle;
 
     public function __construct(
         private ScopeMatcher $scopeMatcher,
-        RequestStack $requestStack
+        RequestStack $requestStack,
     ) {
         $this->request = $requestStack->getCurrentRequest();
     }
@@ -83,16 +52,36 @@ class ParseTemplateListener
             return;
         }
 
+        // Check if the template has an ID (inserted image templates do not have one)
+        if (null === $template->__get('id')) {
+            return;
+        }
+
+        $this->style = <<<'CSS'
+            .image_container_%s::before {
+                padding-top: %s%%;
+            }
+            .image_container_%s {
+                width: %spx;
+            }
+            CSS;
+
+        $this->mediaStyle = <<<'CSS'
+            @media only screen and %s {
+                .image_container_%s::before {
+                    padding-top: %s%%;
+                }
+                .image_container_%s {
+                    width: %spx;
+                }
+            }
+            CSS;
+
         $this->template = $template;
-        $this->templateData = $this->template->getData();
 
         // Check if it is an image template
         if (str_starts_with($template->getName(), 'image')) {
-            $containerClass = $this->calculateStyling((array) $this->templateData['picture']);
-
-            // add container class to the template
-            $this->templateData['containerClass'] = $containerClass;
-            $this->template->setData($this->templateData);
+            $this->handleImageTemplate();
         }
 
         // Check if it is a gallery template
@@ -102,28 +91,50 @@ class ParseTemplateListener
     }
 
     /**
-     * Get the picture values for a gallery template.
+     * Handle image templates to modify the template data.
+     *
+     * @return void
+     */
+    private function handleImageTemplate(): void
+    {
+        // Generate the additional CSS class for the image container
+        $picture = (array) $this->template->__get('picture');
+        $cssClass = $this->generateCssClass($picture);
+
+        // Add the additional CSS class to the template
+        $floatClass = (string) $this->template->__get('floatClass');
+        $this->template->__set('floatClass', $floatClass . ' ' . $cssClass);
+    }
+
+    /**
+     * Handle gallery templates to modify the template data.
      */
     private function calculateGalleryStyling(): void
     {
         $i = 0;
-        $body = $this->templateData['body'];
-        foreach ($body as $row) {
-            foreach ($row as $col) {
+        $rows = (array) $this->template->__get('body');
+        foreach ($rows as $rowI => $row) {
+            /** @var \stdClass $col */
+            foreach ($row as $colI => $col) {
                 // check if an image should get rendered
-                if (!$col->addImage) {
+                if (false === $col->addImage) {
                     continue;
                 }
 
-                ++$i;
+                // Generate the additional CSS class per gallery image
+                $cssClass = $this->generateCssClass((array) $col->picture, '_' . ++$i);
 
-                $containerClass = $this->calculateStyling((array) $col->picture, '_' . $i);
-
-                // add container class to the template
-                // data is automatically added to $this->template as arrays are used here
-                $col->containerClass = $containerClass;
+                // Add the additional CSS class to the image template
+                if (false === isset($col->floatClass)) {
+                    $col->floatClass = '';
+                }
+                $col->floatClass .= ' ' . $cssClass;
+                $rows[$rowI][$colI] = $col;
             }
         }
+
+        // Update the template data
+        $this->template->__set('body', $rows);
     }
 
     /**
@@ -136,23 +147,20 @@ class ParseTemplateListener
      *
      * @phpstan-ignore-next-line
      */
-    private function calculateStyling(array $picture, string $idSuffix = ''): string
+    private function generateCssClass(array $picture, string $idSuffix = ''): string
     {
         // prepare container class
-        $containerClass = 'image_container_' . ($this->templateData['id'] ?? '') . '_' . ($this->templateData['type'] ?? '') . $idSuffix;
+        $cssClass = 'image_container_' . $this->template->__get('id') . '_' . $this->template->__get('type') . $idSuffix;
 
         // check the file type of the image
         $ext = pathinfo($picture['img']['src'])['extension'] ?? '';
 
         // add the extension to the container class
-        $containerClass .= ' image_container_' . $ext;
+        $cssClass .= ' image_container_' . $ext;
 
         // check if there are any values for some styles
         if (0 === \count($picture['sources']) || (!$picture['sources']['0']['width'] && !$picture['img']['width'])) {
-            // add class for no lazy loading
-            $containerClass .= ' image_container_nolazy';
-
-            return $containerClass;
+            return $cssClass;
         }
 
         // check if the image sources or the image itself should be used
@@ -168,12 +176,7 @@ class ParseTemplateListener
             $this->addStyling((int) $picture['img']['width'], (int) $picture['img']['height'], $idSuffix);
         }
 
-        // If the template has no lazy load, add the additional class
-        if (true === str_contains($this->template->getName(), 'nolazy')) {
-            $containerClass .= ' image_container_nolazy';
-        }
-
-        return $containerClass;
+        return $cssClass;
     }
 
     /**
@@ -192,7 +195,7 @@ class ParseTemplateListener
         }
 
         // generate the style id
-        $id = ($this->templateData['id'] ?? '') . '_' . ($this->templateData['type'] ?? '') . $idSuffix;
+        $id = $this->template->__get('id') . '_' . $this->template->__get('type') . $idSuffix;
 
         // calculate the padding
         $padding = round(100 / ($width / $height), 2);

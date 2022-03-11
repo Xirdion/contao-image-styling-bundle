@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Sowieso\ImageStylingBundle\Tests;
 
 use Contao\TestCase\ContaoTestCase;
-use Sowieso\BasicBundle\ContaoImageStylingBundle;
+use Sowieso\ImageStylingBundle\ContaoImageStylingBundle;
 
 class ContaoImageStylingBundleTest extends ContaoTestCase
 {
