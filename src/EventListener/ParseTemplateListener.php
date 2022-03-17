@@ -14,6 +14,7 @@ namespace Sowieso\ImageStylingBundle\EventListener;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\StringUtil;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -163,14 +164,27 @@ class ParseTemplateListener
             return $cssClass;
         }
 
+        // Flag to avoid wrong styling for images with different media sizes
+        // It is only set true if the picture sources have media fields
+        // If the flag is true a simple styling without media query is not possible
+        $hasMedia = false;
+
         // check if the image sources or the image itself should be used
         if ($picture['sources']) {
             foreach ($picture['sources'] as $source) {
                 // Check if it is styling with media query
                 if (false === isset($source['media'])) {
-                    continue;
+                    // Skip entries if the image has specific styling per media query
+                    if (true === $hasMedia) {
+                        continue;
+                    }
+                    // No media query available
+                    $this->addStyling((int) $source['width'], (int) $source['height'], $idSuffix);
+                } else {
+                    // Styling only for a specific media query
+                    $hasMedia = true;
+                    $this->addStyling((int) $source['width'], (int) $source['height'], $idSuffix, (string) $source['media']);
                 }
-                $this->addStyling((int) $source['width'], (int) $source['height'], $idSuffix, (string) $source['media']);
             }
         } elseif ($picture['img']) {
             $this->addStyling((int) $picture['img']['width'], (int) $picture['img']['height'], $idSuffix);
@@ -194,20 +208,31 @@ class ParseTemplateListener
             return;
         }
 
-        // generate the style id
+        // Generate the style id
         $id = $this->template->__get('id') . '_' . $this->template->__get('type') . $idSuffix;
 
-        // calculate the padding
+        // Calculate the padding
         $padding = round(100 / ($width / $height), 2);
 
+        // Create the new style tag
+        // It is possible that the styling for the given parameters has already been added
+        // If that's the case, just return
         if ($media) {
+            $key = StringUtil::standardize($id . '_' . $media);
+            if (true === \array_key_exists($key, self::$css)) {
+                return;
+            }
             $style = sprintf($this->mediaStyle, $media, $id, $padding, $id, $width);
         } else {
+            $key = StringUtil::standardize($id . '_' . $width . '_' . $height);
+            if (true === \array_key_exists($key, self::$css)) {
+                return;
+            }
             $style = sprintf($this->style, $id, $padding, $id, $width);
         }
 
-        // add the styling to the collection
-        self::$css[] = $style;
+        // Add the styling to the collection
+        self::$css[$key] = $style;
 
         // generate the styling tag for the head
         $GLOBALS['TL_HEAD']['resp_image_style'] = Template::generateInlineStyle(implode(\PHP_EOL, self::$css));
