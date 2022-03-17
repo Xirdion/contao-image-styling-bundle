@@ -159,11 +159,6 @@ class ParseTemplateListener
         // add the extension to the container class
         $cssClass .= ' image_container_' . $ext;
 
-        // check if there are any values for some styles
-        if (0 === \count($picture['sources']) || (!$picture['sources']['0']['width'] && !$picture['img']['width'])) {
-            return $cssClass;
-        }
-
         // Flag to avoid wrong styling for images with different media sizes
         // It is only set true if the picture sources have media fields
         // If the flag is true a simple styling without media query is not possible
