@@ -159,6 +159,13 @@ class ParseTemplateListener
         // add the extension to the container class
         $cssClass .= ' image_container_' . $ext;
 
+        // Check if there are any dimensions given for the image
+        if (false === isset($picture['img']['width'])) {
+            $cssClass .= ' image_nolazy';
+
+            return $cssClass;
+        }
+
         // Flag to avoid wrong styling for images with different media sizes
         // It is only set true if the picture sources have media fields
         // If the flag is true a simple styling without media query is not possible
