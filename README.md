@@ -134,6 +134,54 @@ if (null !== $image) {
 ```
 
 ---
+
+### Tipps und Tricks
+
+Damit die Logik des Bundles greifen kann, muss das image- oder gallery-Template eine ID besitzen.
+Diese wird benötigt, um ein eindeutiges Styling zu generieren.
+
+Ist die ID nicht vorhanden, wird kein eigenes Styling erstellt und kein Placeholder ist vorhanden.
+Wird für den `<img>`-Tag keine eigene Breite/Höhe verwendet, kann es sein, dass das Bild dann nicht angezeigt wird.
+
+![image_template_id](./docs/image_template_id.png)
+
+```php
+$figure = $this->studio
+    ->createFigureBuilder()
+    ->from($singleSRC)
+    ->setSize($size)
+    ->setMetadata($metadata)
+    ->buildIfResourceExists()
+;
+
+if (null === $figure) {
+    return null;
+}
+
+$image = $figure->getImage();
+$orgSize = $image->getOriginalDimensions()->getSize();
+$metadata = $figure->hasMetadata() ? $figure->getMetadata() : new Metadata([]);
+$linkAttributes = $figure->getLinkAttributes();
+$href = $figure->getLinkHref();
+
+$templateData = [
+    'id' => 'my_unique_template_id',
+    'type' => 'my_image_type',
+    'picture' => [
+        'img' => $image->getImg(),
+        'sources' => $image->getSources(),
+        'alt' => StringUtil::specialchars($metadata->getAlt()),
+    ],
+    'width' => $orgSize->getWidth(),
+    'height' => $orgSize->getHeight(),
+    'singleSRC' => $image->getFilePath(),
+    'src' => $image->getImageSrc(),
+    'href' => $href,
+    'linkTitle' => (\array_key_exists('title', $linkAttributes) ? $linkAttributes['title'] : $metadata->getTitle()),
+];
+```
+
+---
 ---
 ---
 
@@ -259,4 +307,52 @@ if (null !== $image) {
         $this->insert('image', $imgData);
     }
 }
+```
+
+---
+
+### Tips and tricks
+
+For the logic of the bundle to work, the image or gallery template must have an ID. 
+This is needed to generate a unique styling.
+
+If the ID is not present, no custom styling is created and no placeholder is present. 
+If no custom width/height is used for the `<img>` tag, the image may not be displayed then.
+
+![image_template_id](./docs/image_template_id.png)
+
+```php
+$figure = $this->studio
+    ->createFigureBuilder()
+    ->from($singleSRC)
+    ->setSize($size)
+    ->setMetadata($metadata)
+    ->buildIfResourceExists()
+;
+
+if (null === $figure) {
+    return null;
+}
+
+$image = $figure->getImage();
+$orgSize = $image->getOriginalDimensions()->getSize();
+$metadata = $figure->hasMetadata() ? $figure->getMetadata() : new Metadata([]);
+$linkAttributes = $figure->getLinkAttributes();
+$href = $figure->getLinkHref();
+
+$templateData = [
+    'id' => 'my_unique_template_id',
+    'type' => 'my_image_type',
+    'picture' => [
+        'img' => $image->getImg(),
+        'sources' => $image->getSources(),
+        'alt' => StringUtil::specialchars($metadata->getAlt()),
+    ],
+    'width' => $orgSize->getWidth(),
+    'height' => $orgSize->getHeight(),
+    'singleSRC' => $image->getFilePath(),
+    'src' => $image->getImageSrc(),
+    'href' => $href,
+    'linkTitle' => (\array_key_exists('title', $linkAttributes) ? $linkAttributes['title'] : $metadata->getTitle()),
+];
 ```
