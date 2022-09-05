@@ -8,3 +8,10 @@ services:
       - '@request_stack'
     tags:
       - { name: contao.hook, hook: parseTemplate, method: onParseTemplate }
+
+  Sowieso\ImageStylingBundle\EventListener\GeneratePageListener:
+    arguments:
+      - '@contao.assets.files_context'
+      - '@Sowieso\ImageStylingBundle\Image\StyleCalculator'
+    tags:
+      - { name: contao.hook, hook: generatePage }

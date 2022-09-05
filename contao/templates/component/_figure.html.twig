@@ -1,0 +1,8 @@
+{% use '@Contao/component/_figure.html.twig' %}
+
+{% block figure_component %}
+    {% set figure_attributes = img_style(figure)
+        .mergeWith(figure_attributes|default)
+    %}
+    {{ parent() }}
+{% endblock %}

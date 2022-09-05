@@ -1,0 +1,24 @@
+services:
+  _defaults:
+    autowire: true
+
+  Sowieso\ImageStylingBundle\Image\StyleCalculator:
+    class: Sowieso\ImageStylingBundle\Image\StyleCalculator
+    arguments:
+      - '@kernel'
+      - '@filesystem'
+
+  Sowieso\ImageStylingBundle\Twig\ImageStylingRuntime:
+    class: Sowieso\ImageStylingBundle\Twig\ImageStylingRuntime
+    arguments:
+      - '@request_stack'
+      - '@contao.routing.scope_matcher'
+      - '@Sowieso\ImageStylingBundle\Image\StyleCalculator'
+    tags:
+      - { name: "twig.runtime" }
+
+  Sowieso\ImageStylingBundle\Twig\ImageStylingExtension:
+    class: Sowieso\ImageStylingBundle\Twig\ImageStylingExtension
+    tags:
+      - { name: "twig.extension" }
+

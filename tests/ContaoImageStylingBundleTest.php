@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @copyright  Copyright (c) 2022, Ideenwerkstatt Sowieso GmbH & Co. KG
  * @author     Sowieso GmbH & Co. KG <https://sowieso.team>
- * @link       https://github.com/sowieso-web/contao-basic-bundle
+ * @link       https://github.com/sowieso-web/contao-image-styling-bundle
  */
 
 namespace Sowieso\ImageStylingBundle\Tests;

@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @copyright  Copyright (c) 2022, Ideenwerkstatt Sowieso GmbH & Co. KG
  * @author     Sowieso GmbH & Co. KG <https://sowieso.team>
- * @link       https://github.com/sowieso-web/contao-basic-bundle
+ * @link       https://github.com/sowieso-web/contao-image-styling-bundle
  */
 
 namespace Sowieso\ImageStylingBundle\EventListener;
@@ -16,7 +16,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\StringUtil;
 use Contao\Template;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AsHook('parseTemplate', 'onParseTemplate')]
@@ -25,16 +24,14 @@ class ParseTemplateListener
     /** @var string[] */
     private static array $css = [];
 
-    private ?Request $request;
     private Template $template;
     private string $style;
     private string $mediaStyle;
 
     public function __construct(
-        private ScopeMatcher $scopeMatcher,
-        RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
+        private readonly ScopeMatcher $scopeMatcher,
     ) {
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -44,12 +41,14 @@ class ParseTemplateListener
      */
     public function onParseTemplate(Template $template): void
     {
-        if (null === $this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
             return;
         }
 
         // Do nothing on a backend request
-        if (true === $this->scopeMatcher->isBackendRequest($this->request)) {
+        if (true === $this->scopeMatcher->isBackendRequest($request)) {
             return;
         }
 
