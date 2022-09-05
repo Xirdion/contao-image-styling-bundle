@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Sowieso\ImageStylingBundle\EventListener;
 
-use Contao\CoreBundle\Asset\ContaoContext;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\LayoutModel;
 use Contao\PageModel;
@@ -23,16 +22,14 @@ use Sowieso\ImageStylingBundle\Image\StyleCalculator;
 class GeneratePageListener
 {
     public function __construct(
-        private readonly ContaoContext $contaoContext,
         private readonly StyleCalculator $styleCalculator,
     ) {
     }
 
     public function __invoke(PageModel $pageModel, LayoutModel $layoutModel, PageRegular $pageRegular): void
     {
-        $test = $this->contaoContext->getBasePath();
-        $test2 = $this->contaoContext->getStaticUrl();
-
-        $GLOBALS['TL_CSS']['imageStyling'] = $this->styleCalculator->getStyleFile(true) . '|static';
+        if ($this->styleCalculator->hasStyling()) {
+            $GLOBALS['TL_CSS']['imageStyling'] = $this->styleCalculator->getStyleFile(true) . '|static';
+        }
     }
 }

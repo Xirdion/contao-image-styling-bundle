@@ -61,6 +61,16 @@ class StyleCalculator
     }
 
     /**
+     * Check if any styling has been generated.
+     *
+     * @return bool
+     */
+    public function hasStyling(): bool
+    {
+        return 0 !== self::$counter;
+    }
+
+    /**
      * Get the CSS file which is used to add the generated styles to html.
      *
      * @param bool $relative
