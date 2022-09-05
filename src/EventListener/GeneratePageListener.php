@@ -26,6 +26,15 @@ class GeneratePageListener
     ) {
     }
 
+    /**
+     * If some image styling was calculated include the given CSS file.
+     *
+     * @param PageModel   $pageModel
+     * @param LayoutModel $layoutModel
+     * @param PageRegular $pageRegular
+     *
+     * @return void
+     */
     public function __invoke(PageModel $pageModel, LayoutModel $layoutModel, PageRegular $pageRegular): void
     {
         if ($this->styleCalculator->hasStyling()) {

@@ -34,12 +34,12 @@ class ImageStylingRuntime implements RuntimeExtensionInterface
      *
      * @param Figure|null $figure
      *
-     * @return HtmlAttributes
+     * @return HtmlAttributes|string
      */
-    public function calculateStyling(Figure|null $figure): HtmlAttributes
+    public function calculateStyling(Figure|null $figure): HtmlAttributes|string
     {
         // Initialize the HtmlAttributes
-        $attributes = new HtmlAttributes();
+        $attributes = class_exists(HtmlAttributes::class) ? new HtmlAttributes() : '';
 
         // First check if the image styling should get calculated
         if (null === $figure) {
@@ -58,7 +58,11 @@ class ImageStylingRuntime implements RuntimeExtensionInterface
         // Calculate the styling and add the new CSS class to the figure
         $this->styleCalculator->calculate($figure);
 
-        $attributes->set('class', $this->styleCalculator->getCssClass());
+        if ($attributes instanceof HtmlAttributes) {
+            $attributes->set('class', $this->styleCalculator->getCssClass());
+        } else {
+            $attributes = 'class="' . $this->styleCalculator->getCssClass() . '"';
+        }
 
         return $attributes;
     }

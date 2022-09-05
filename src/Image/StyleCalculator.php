@@ -31,8 +31,7 @@ class StyleCalculator
      * @var string
      */
     private static string $style = <<<'CSS'
-        .%s::before {padding-top: %s%%;}
-        .%s {width: %spx;}
+        .%s::before {padding-top: %s%%;}.%s {width: %spx;}
         CSS;
 
     /**
@@ -41,10 +40,7 @@ class StyleCalculator
      * @var string
      */
     private static string $mediaStyle = <<<'CSS'
-        @media only screen and %s {
-            .%s::before {padding-top: %s%%;}
-            .%s {width: %spx;}
-        }
+        @media only screen and %s {.%s::before {padding-top: %s%%;}.%s {width: %spx;}}
         CSS;
 
     /**
@@ -82,7 +78,7 @@ class StyleCalculator
         $projectDir = $this->kernel->getProjectDir();
 
         // Generate absolute path to custom CSS file
-        $path = $projectDir . '/public/bundles/contaoimagestyling/';
+        $path = $projectDir . '/web/bundles/contaoimagestyling/';
 
         if (true === $relative) {
             // Create a relative path from the project directory
@@ -121,19 +117,17 @@ class StyleCalculator
         $this->cssClass = 'image_container--' . ++self::$counter;
 
         // Create and initialize the styling variable
-        $styling = '';
-
-        /** @var array{array{srcset:string, src:string, width:int, height:int, media:string}} $sources */
-        $sources = $figure->getImage()->getSources();
+        $styling = [];
 
         // Check if an image size width different media queries is used
         // If there are no entries the height and width of the picture can be used
         // to calculate the styling
+        $sources = $figure->getImage()->getSources();
         if (0 === \count($sources)) {
             /** @var array{srcset:string, src:string, width:int, height:int, class:string, hasSingleAspectRatio:bool} $img */
             $img = $figure->getImage()->getImg();
 
-            $styling = $this->createStyling($img['width'], $img['height']);
+            $styling[] = $this->createStyling($img['width'], $img['height']);
         } else {
             // Flag to avoid wrong styling for images with different media sizes
             // It is only set true if the picture sources have media fields
@@ -147,18 +141,18 @@ class StyleCalculator
                         continue;
                     }
 
-                    $styling = $this->createStyling($source['width'], $source['height']);
+                    $styling[] = $this->createStyling($source['width'], $source['height']);
                 } else {
                     $hasMedia = true;
-                    $styling = $this->createStyling($source['width'], $source['height'], $source['media']);
+                    $styling[] = $this->createStyling($source['width'], $source['height'], $source['media']);
                 }
             }
         }
 
         // Try to add the generated Styling to a file
         // If no style was generated just to nothing
-        if ('' !== $styling) {
-            $this->filesystem->appendToFile($this->getStyleFile(), $styling);
+        if (0 !== \count($styling)) {
+            $this->filesystem->appendToFile($this->getStyleFile(), implode('', $styling));
         }
     }
 
