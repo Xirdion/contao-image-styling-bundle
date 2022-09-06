@@ -14,7 +14,7 @@
             <directory suffix=".php">src</directory>
         </include>
         <exclude>
-            <directory>./src/</directory>
+            <directory>./src/EventListener</directory>
             <directory>./tests/</directory>
         </exclude>
     </coverage>

@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @copyright  Copyright (c) 2022, Ideenwerkstatt Sowieso GmbH & Co. KG
  * @author     Sowieso GmbH & Co. KG <https://sowieso.team>
- * @link       https://github.com/sowieso-web/contao-basic-bundle
+ * @link       https://github.com/sowieso-web/contao-image-styling-bundle
  */
 
 namespace Sowieso\ImageStylingBundle\DependencyInjection;
@@ -30,14 +30,15 @@ class ContaoImageStylingExtension extends Extension
     {
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
+            new FileLocator(__DIR__ . '/../../config')
         );
 
         try {
+            $loader->load('services.yaml');
             $loader->load('listener.yaml');
         } catch (\Exception $e) {
             echo $e->getMessage();
-            exit();
+            exit;
         }
     }
 }

@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @copyright  Copyright (c) 2022, Ideenwerkstatt Sowieso GmbH & Co. KG
  * @author     Sowieso GmbH & Co. KG <https://sowieso.team>
- * @link       https://github.com/sowieso-web/contao-basic-bundle
+ * @link       https://github.com/sowieso-web/contao-image-styling-bundle
  */
 
 namespace Sowieso\ImageStylingBundle\Tests;
@@ -21,5 +21,19 @@ class ContaoImageStylingBundleTest extends ContaoTestCase
     {
         $bundle = new ContaoImageStylingBundle();
         $this->assertInstanceOf(ContaoImageStylingBundle::class, $bundle);
+    }
+
+    public function testgetPath(): void
+    {
+        $bundle = new ContaoImageStylingBundle();
+
+        $this->assertSame(\dirname(__DIR__), $bundle->getPath());
+    }
+
+    public function testHasTheCorrectNamespace(): void
+    {
+        $reflection = new \ReflectionClass(ContaoImageStylingBundle::class);
+
+        $this->assertSame('Sowieso\ImageStylingBundle', $reflection->getNamespaceName());
     }
 }

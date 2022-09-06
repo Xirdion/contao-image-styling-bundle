@@ -5,7 +5,7 @@ This file is part of SowieSo contao-image-styling-bundle
 
 @copyright  Copyright (c) 2022, Ideenwerkstatt Sowieso GmbH & Co. KG
 @author     Sowieso GmbH & Co. KG <https://sowieso.team>
-@link       https://github.com/sowieso-web/contao-basic-bundle
+@link       https://github.com/sowieso-web/contao-image-styling-bundle
 EOF;
 $finder = PhpCsFixer\Finder::create()
     ->in([
