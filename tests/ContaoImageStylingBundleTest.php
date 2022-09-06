@@ -22,4 +22,18 @@ class ContaoImageStylingBundleTest extends ContaoTestCase
         $bundle = new ContaoImageStylingBundle();
         $this->assertInstanceOf(ContaoImageStylingBundle::class, $bundle);
     }
+
+    public function testgetPath(): void
+    {
+        $bundle = new ContaoImageStylingBundle();
+
+        $this->assertSame(\dirname(__DIR__), $bundle->getPath());
+    }
+
+    public function testHasTheCorrectNamespace(): void
+    {
+        $reflection = new \ReflectionClass(ContaoImageStylingBundle::class);
+
+        $this->assertSame('Sowieso\ImageStylingBundle', $reflection->getNamespaceName());
+    }
 }

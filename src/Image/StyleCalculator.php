@@ -14,7 +14,6 @@ namespace Sowieso\ImageStylingBundle\Image;
 
 use Contao\CoreBundle\Image\Studio\Figure;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class StyleCalculator
 {
@@ -51,8 +50,8 @@ class StyleCalculator
     private string $cssClass;
 
     public function __construct(
-        private readonly KernelInterface $kernel,
         private readonly Filesystem $filesystem,
+        private readonly string $webDir,
     ) {
     }
 
@@ -75,14 +74,12 @@ class StyleCalculator
      */
     public function getStyleFile(bool $relative = false): string
     {
-        $projectDir = $this->kernel->getProjectDir();
-
         // Generate absolute path to custom CSS file
-        $path = $projectDir . '/web/bundles/contaoimagestyling/';
+        $path = $this->webDir . '/bundles/contaoimagestyling/';
 
         if (true === $relative) {
             // Create a relative path from the project directory
-            $path = $this->filesystem->makePathRelative($path, $projectDir);
+            $path = $this->filesystem->makePathRelative($path, $this->webDir);
         }
 
         return $path . 'image_style.css';
