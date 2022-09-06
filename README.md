@@ -1,5 +1,5 @@
 ![Packagist Version](https://img.shields.io/packagist/v/sowieso/contao-image-styling-bundle?label=version)
-<a href="https://codecov.io/gh/sowieso-web/contao-image-styling-bundle"><img src="https://codecov.io/gh/sowieso-web/contao-image-styling-bundle/branch/main/graph/badge.svg" alt></a>
+[![codecov](https://codecov.io/gh/sowieso-web/contao-image-styling-bundle/branch/main/graph/badge.svg?token=4WGBX137KC)](https://codecov.io/gh/sowieso-web/contao-image-styling-bundle)
 ![Packagist Downloads](https://img.shields.io/packagist/dt/sowieso/contao-image-styling-bundle?color=brigthgreen)
 
 # Responsive Image Styling Bundle
