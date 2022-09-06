@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-        backupGlobals="false"
-        colors="true"
-        bootstrap="vendor/autoload.php"
-        stopOnFailure="true"
-        failOnRisky="true"
-        failOnWarning="true"
->
-    <coverage>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-        <exclude>
-            <directory>./src/EventListener</directory>
-            <directory>./tests/</directory>
-        </exclude>
-    </coverage>
-    <php>
-        <ini name="error_reporting" value="-1"/>
-        <ini name="display_errors" value="1"/>
-        <ini name="display_startup_errors" value="1"/>
-        <ini name="intl.default_locale" value="en"/>
-        <ini name="intl.error_level" value="0"/>
-        <env name="KERNEL_CLASS" value="Contao\ManagerBundle\HttpKernel\ContaoKernel"/>
-        <env name="APP_ENV" value="test"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
-    </php>
-    <testsuites>
-        <testsuite name="unit">
-            <directory>./tests/</directory>
-        </testsuite>
-    </testsuites>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd" colors="true" defaultTestSuite="unit" bootstrap="vendor/autoload.php" beStrictAboutChangesToGlobalState="true">
+<coverage>
+    <include>
+        <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+        <directory>./src/EventListener</directory>
+        <directory>./tests/</directory>
+    </exclude>
+</coverage>
+<php>
+    <ini name="error_reporting" value="-1"/>
+    <ini name="display_errors" value="1"/>
+    <ini name="display_startup_errors" value="1"/>
+    <ini name="intl.default_locale" value="en"/>
+    <ini name="intl.error_level" value="0"/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
+    <env name="SYMFONY_PATCH_TYPE_DECLARATIONS" value="deprecations=0"/>
+    <env name="KERNEL_CLASS" value="Contao\ManagerBundle\HttpKernel\ContaoKernel"/>
+    <env name="DISABLE_HTTP_CACHE" value="1"/>
+    <env name="APP_SECRET" value="foobar"/>
+    <env name="APP_ENV" value="test"/>
+    <env name="APP_DEBUG" value=""/>
+    <env name="DATABASE_URL" value="mysql://root@localhost:3306/contao_test"/>
+</php>
+<testsuites>
+    <testsuite name="unit">
+        <directory>./tests/</directory>
+    </testsuite>
+    <testsuite name="coverage">
+        <directory>./tests/</directory>
+    </testsuite>
+</testsuites>
+<extensions>
+    <extension class="Contao\TestCase\ClearCachePhpunitExtension"/>
+    <extension class="Contao\TestCase\WarnXdebugPhpunitExtension"/>
+</extensions>
 </phpunit>
