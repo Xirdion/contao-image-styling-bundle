@@ -53,11 +53,6 @@ class ParseTemplateListener
             return;
         }
 
-        // Check if the template has an ID (inserted image templates do not have one)
-        if (null === $template->__get('id')) {
-            return;
-        }
-
         $this->style = <<<'CSS'
             .image_container_%s::before {
                 padding-top: %s%%;
