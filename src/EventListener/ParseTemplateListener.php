@@ -64,7 +64,7 @@ class ParseTemplateListener
             ->createFigureBuilder()
             ->from($template->__get('singleSRC'))
             ->setSize($template->__get('size'))
-            ->enableLightbox($template->__get('fullsize'))
+            ->enableLightbox($template->__get('fullsize') ?? false)
             // ->setMetadata($this->objModel->getOverwriteMetadata())
             ->buildIfResourceExists()
         ;
