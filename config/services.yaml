@@ -5,7 +5,6 @@ services:
   Sowieso\ImageStylingBundle\Image\StyleCalculator:
     class: Sowieso\ImageStylingBundle\Image\StyleCalculator
     arguments:
-      - '@kernel'
       - '@filesystem'
       - '%contao.web_dir%'
 
