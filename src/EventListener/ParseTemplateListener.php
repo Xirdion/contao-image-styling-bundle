@@ -61,11 +61,6 @@ class ParseTemplateListener
 
         // The style calculation is just important for image-templates
         if (false === str_starts_with($template->getName(), 'image')) {
-            // Reset size value because a gallery should be over now
-            if (null !== self::$size) {
-                self::$size = null;
-            }
-
             return;
         }
 
