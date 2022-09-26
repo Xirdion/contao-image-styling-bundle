@@ -15,6 +15,7 @@ namespace Sowieso\ImageStylingBundle\EventListener;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\Image\PictureConfiguration;
 use Contao\Template;
 use Sowieso\ImageStylingBundle\Image\StyleCalculator;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 #[AsHook('parseTemplate', 'onParseTemplate')]
 class ParseTemplateListener
 {
+    private static int|string|array|PictureConfiguration|null $size = null;
+
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly ScopeMatcher $scopeMatcher,
@@ -49,14 +52,31 @@ class ParseTemplateListener
         }
 
         // Check the name of the template.
+        if (true === str_starts_with($template->getName(), 'gallery')) {
+            // Save the image size of the gallery templates
+            self::$size = $template->__get('size');
+
+            return;
+        }
+
         // The style calculation is just important for image-templates
         if (false === str_starts_with($template->getName(), 'image')) {
+            // Reset size value because a gallery should be over now
+            if (null !== self::$size) {
+                self::$size = null;
+            }
+
             return;
         }
 
         // Check if the current template has an image
         if (!$template->__get('singleSRC')) {
             return;
+        }
+
+        // Check if a saved size must be used
+        if (null !== self::$size && !$template->__get('size')) {
+            $template->__set('size', self::$size);
         }
 
         // Generate a figure object
