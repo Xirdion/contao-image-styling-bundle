@@ -1,13 +1,12 @@
 {
-  "name": "sowieso/contao-image-styling-bundle",
+  "name": "xirdion/contao-image-styling-bundle",
   "type": "contao-bundle",
   "description": "Add responsive placeholder styling to lazy loaded images",
   "license":"AGPL-3.0-or-later",
   "authors": [
     {
-      "name": "SowieSo GmbH & Co.KG",
-      "email": "development@sowieso.team",
-      "homepage": "https://sowieso.team"
+      "name": "Thomas Dirscherl",
+      "homepage": "https://github.com/xirdion"
     }
   ],
   "require": {
